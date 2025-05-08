@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本史 早解きクイズ</title>
+    <title>日本史 カテゴリ別 早解きクイズ</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -28,10 +28,10 @@
             text-align: center;
         }
         h1 {
-            color: #5a3e2b; /* 落ち着いた茶色 */
+            color: #5a3e2b;
             margin-bottom: 20px;
         }
-        #question-area, #result-area {
+        #question-area, #result-area, #category-selection-area {
             margin-bottom: 20px;
         }
         #question-text {
@@ -46,8 +46,8 @@
             gap: 15px;
             margin-bottom: 20px;
         }
-        .option-button {
-            background-color: #87ceeb; /* スカイブルー */
+        .option-button, .category-button {
+            background-color: #87ceeb;
             color: white;
             border: none;
             padding: 15px;
@@ -55,29 +55,29 @@
             cursor: pointer;
             border-radius: 5px;
             transition: background-color 0.3s ease;
-            min-height: 60px; /* ボタンの高さを統一 */
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .option-button:hover:not(:disabled) {
-            background-color: #6495ed; /* コーンフラワーブルー */
+        .option-button:hover:not(:disabled), .category-button:hover {
+            background-color: #6495ed;
         }
         .option-button:disabled {
             cursor: not-allowed;
             opacity: 0.7;
         }
         .option-button.correct {
-            background-color: #90ee90; /* ライトグリーン */
+            background-color: #90ee90;
         }
         .option-button.incorrect {
-            background-color: #f08080; /* ライトコーラル */
+            background-color: #f08080;
         }
         #feedback-text {
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 15px;
-            min-height: 1.2em; /* フィードバック表示領域を確保 */
+            min-height: 1.2em;
         }
         #feedback-text.correct {
             color: green;
@@ -85,8 +85,8 @@
         #feedback-text.incorrect {
             color: red;
         }
-        #next-button, #start-button, #restart-button {
-            background-color: #ffa500; /* オレンジ */
+        #next-button, #start-button, #restart-button, #back-to-category-button {
+            background-color: #ffa500;
             color: white;
             border: none;
             padding: 12px 25px;
@@ -96,8 +96,8 @@
             transition: background-color 0.3s ease;
             margin-top: 10px;
         }
-        #next-button:hover, #start-button:hover, #restart-button:hover {
-            background-color: #ff8c00; /* ダークオレンジ */
+        #next-button:hover, #start-button:hover, #restart-button:hover, #back-to-category-button:hover {
+            background-color: #ff8c00;
         }
         #info-area {
             display: flex;
@@ -109,7 +109,7 @@
             font-weight: bold;
             color: #555;
         }
-        #result-area h2 {
+        #result-area h2, #category-selection-area h2 {
             color: #5a3e2b;
         }
         #final-score {
@@ -118,8 +118,13 @@
             color: #ff8c00;
             margin: 20px 0;
         }
+        .category-buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
 
-        /* スマホ表示調整 */
         @media (max-width: 600px) {
             body {
                 padding: 10px;
@@ -131,9 +136,9 @@
                 font-size: 1.2em;
             }
             .options-grid {
-                grid-template-columns: 1fr; /* 縦一列に */
+                grid-template-columns: 1fr;
             }
-            .option-button {
+            .option-button, .category-button {
                 font-size: 0.9em;
                 padding: 12px;
             }
@@ -144,25 +149,32 @@
                 gap: 5px;
             }
         }
-
     </style>
 </head>
 <body>
     <div class="quiz-container">
-        <h1>日本史 早解きクイズ</h1>
+        <h1>日本史 カテゴリ別 早解きクイズ</h1>
 
         <div id="start-area">
-            <p>各問題、早く正解するほど高得点！<br>全30問に挑戦しよう！</p>
-            <button id="start-button">スタート</button>
+            <p>挑戦するカテゴリを選んで、早解きクイズに挑戦しよう！<br>各カテゴリ10問です。</p>
+            <button id="start-button">挑戦を始める</button>
+        </div>
+
+        <div id="category-selection-area" style="display: none;">
+            <h2>挑戦するカテゴリを選んでください</h2>
+            <div class="category-buttons-container">
+                <button class="category-button" data-category="原始・古代">原始・古代史 (10問)</button>
+                <button class="category-button" data-category="中世">中世史 (10問)</button>
+                <button class="category-button" data-category="人物史">人物史 (10問)</button>
+            </div>
         </div>
 
         <div id="quiz-area" style="display: none;">
             <div id="info-area">
-                <span id="question-counter">問題: 1/30</span>
+                <span id="question-counter">問題: 1/10</span>
                 <span id="timer">時間: 0秒</span>
                 <span id="current-score">得点: 0</span>
             </div>
-
             <div id="question-area">
                 <p id="question-text"></p>
                 <div class="options-grid">
@@ -172,21 +184,22 @@
                     <button class="option-button" id="option3"></button>
                 </div>
             </div>
-
             <p id="feedback-text"></p>
             <button id="next-button" style="display: none;">次の問題へ</button>
         </div>
 
         <div id="result-area" style="display: none;">
             <h2>クイズ終了！</h2>
-            <p>あなたの最終スコアは...</p>
+            <p id="result-category-name"></p>
+            <p>あなたのスコアは...</p>
             <p id="final-score">0点</p>
-            <button id="restart-button">もう一度挑戦する</button>
+            <button id="restart-button">もう一度挑戦する (カテゴリ選択へ)</button>
+            <button id="back-to-category-button">他のカテゴリに挑戦する</button>
         </div>
     </div>
 
     <script>
-        const quizData = [
+        const allQuizData = [
             // 原始・古代 (10問)
             { category: "原始・古代", question: "日本列島で最も古い人類の化石や打製石器が発見されている、群馬県の遺跡は何でしょう？", options: ["登呂遺跡", "岩宿遺跡", "吉野ヶ里遺跡", "三内丸山遺跡"], answer: "岩宿遺跡" },
             { category: "原始・古代", question: "縄文時代の人々が食料の加工や貯蔵、祭祀などに用いたと考えられている、表面に縄目の文様が特徴的な土器を何と呼びますか？", options: ["弥生土器", "須恵器", "縄文土器", "土師器"], answer: "縄文土器" },
@@ -233,10 +246,13 @@
         const nextButton = document.getElementById('next-button');
         const startButton = document.getElementById('start-button');
         const restartButton = document.getElementById('restart-button');
+        const backToCategoryButton = document.getElementById('back-to-category-button');
         
         const startArea = document.getElementById('start-area');
+        const categorySelectionArea = document.getElementById('category-selection-area');
         const quizArea = document.getElementById('quiz-area');
         const resultArea = document.getElementById('result-area');
+        const resultCategoryNameEl = document.getElementById('result-category-name');
         
         const timerEl = document.getElementById('timer');
         const currentScoreEl = document.getElementById('current-score');
@@ -247,7 +263,8 @@
         let score = 0;
         let timerInterval;
         let secondsElapsed = 0;
-        let shuffledQuizData = [];
+        let currentCategory = '';
+        let categoryQuizData = [];
 
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -256,31 +273,32 @@
             }
         }
 
-        function startGame() {
+        function showCategorySelection() {
             startArea.style.display = 'none';
-            quizArea.style.display = 'block';
+            quizArea.style.display = 'none';
             resultArea.style.display = 'none';
+            categorySelectionArea.style.display = 'block';
+        }
+
+        function startQuizForCategory(category) {
+            currentCategory = category;
+            categoryQuizData = allQuizData.filter(q => q.category === category);
+            shuffleArray(categoryQuizData); // カテゴリ内の問題をシャッフル
+
+            categorySelectionArea.style.display = 'none';
+            quizArea.style.display = 'block';
             
             currentQuestionIndex = 0;
             score = 0;
             currentScoreEl.textContent = `得点: ${score}`;
-            
-            // 問題をシャッフル（毎回同じ順番にならないように）
-            shuffledQuizData = [...quizData];
-            shuffleArray(shuffledQuizData); 
-            // さらに選択肢もシャッフルする場合 (オプション)
-            // shuffledQuizData.forEach(q => shuffleArray(q.options));
-
-
             loadQuestion();
         }
 
         function loadQuestion() {
             resetState();
-            const currentQuestion = shuffledQuizData[currentQuestionIndex];
+            const currentQuestion = categoryQuizData[currentQuestionIndex];
             questionTextEl.textContent = currentQuestion.question;
             
-            // 選択肢の順番を毎回シャッフル
             const shuffledOptions = [...currentQuestion.options];
             shuffleArray(shuffledOptions);
 
@@ -289,7 +307,7 @@
                 optionButtons[index].onclick = () => selectAnswer(option, currentQuestion.answer);
             });
 
-            questionCounterEl.textContent = `問題: ${currentQuestionIndex + 1}/${shuffledQuizData.length}`;
+            questionCounterEl.textContent = `問題: ${currentQuestionIndex + 1}/${categoryQuizData.length}`;
             startTimer();
         }
 
@@ -319,7 +337,7 @@
         function selectAnswer(selectedOption, correctAnswer) {
             stopTimer();
             optionButtons.forEach(button => {
-                button.disabled = true; // 全ての選択肢を無効化
+                button.disabled = true;
                 if (button.textContent === correctAnswer) {
                     button.classList.add('correct');
                 } else if (button.textContent === selectedOption) {
@@ -328,7 +346,7 @@
             });
 
             if (selectedOption === correctAnswer) {
-                const points = Math.max(10, 100 - (secondsElapsed * 5)); // 満点100、1秒ごとに5点減点、最低10点
+                const points = Math.max(10, 100 - (secondsElapsed * 5));
                 score += points;
                 feedbackTextEl.textContent = `正解！ +${points}点 (解答時間: ${secondsElapsed}秒)`;
                 feedbackTextEl.className = 'correct';
@@ -343,20 +361,29 @@
         function showResults() {
             quizArea.style.display = 'none';
             resultArea.style.display = 'block';
+            resultCategoryNameEl.textContent = `【${currentCategory}】の結果`;
             finalScoreEl.textContent = `${score}点`;
         }
 
+        startButton.addEventListener('click', showCategorySelection);
+
+        document.querySelectorAll('.category-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                startQuizForCategory(e.target.dataset.category);
+            });
+        });
+
         nextButton.addEventListener('click', () => {
             currentQuestionIndex++;
-            if (currentQuestionIndex < shuffledQuizData.length) {
+            if (currentQuestionIndex < categoryQuizData.length) {
                 loadQuestion();
             } else {
                 showResults();
             }
         });
-
-        startButton.addEventListener('click', startGame);
-        restartButton.addEventListener('click', startGame);
+        
+        restartButton.addEventListener('click', showCategorySelection); // 「もう一度挑戦する」はカテゴリ選択へ
+        backToCategoryButton.addEventListener('click', showCategorySelection); // 「他のカテゴリに挑戦する」もカテゴリ選択へ
 
     </script>
 </body>
